@@ -9,30 +9,47 @@ import java.util.ArrayList;
 public class Transaction {
 
     int id;
-    String name,phone,product,price,date;
-
+    String name,phone,product,date,buy_price,sell_price;
     public Transaction() {
     }
 
-    public Transaction(String name, String phone, String product, String price, String date) {
+    public Transaction(String name, String phone, String product, String buy_price,String sell_price, String date) {
         this.name = name;
         this.phone = phone;
         this.product = product;
-        this.price = price;
         this.date = date;
+        this.buy_price=buy_price;
+        this.sell_price=sell_price;
     }
 
-    public Transaction(int id, String name, String phone, String product, String price, String date) {
+    public Transaction(int id, String name, String phone, String product, String buy_price,String sell_price, String date) {
         this.id = id;
         this.name = name;
         this.phone = phone;
         this.product = product;
         this.date = date;
-        this.price = price;
+        this.buy_price=buy_price;
+        this.sell_price=sell_price;
     }
 
     public int getId() {
         return id;
+    }
+
+    public String getBuy_price() {
+        return buy_price;
+    }
+
+    public void setBuy_price(String buy_price) {
+        this.buy_price = buy_price;
+    }
+
+    public String getSell_price() {
+        return sell_price;
+    }
+
+    public void setSell_price(String sell_price) {
+        this.sell_price = sell_price;
     }
 
     public void setId(int id) {
@@ -71,11 +88,5 @@ public class Transaction {
         this.date = date;
     }
 
-    public String getPrice() {
-        return price;
-    }
 
-    public void setPrice(String price) {
-        this.price = price;
-    }
 }
