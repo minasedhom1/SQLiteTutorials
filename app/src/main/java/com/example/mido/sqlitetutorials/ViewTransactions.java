@@ -1,12 +1,16 @@
 package com.example.mido.sqlitetutorials;
 
 import android.app.Dialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +18,13 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.security.AccessController.getContext;
@@ -31,6 +37,14 @@ public class ViewTransactions extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_transactions);
+
+      //  SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        SearchView search = (SearchView) findViewById(R.id.search_view);
+
+    //    search.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+
+
         totBPrice_tv = (TextView) findViewById(R.id.total_buy_price_tv);
         totSPrice_tv = (TextView) findViewById(R.id.total_sell_price_tv);
         totProf_tv= (TextView) findViewById(R.id.total_profit_tv);
@@ -72,7 +86,21 @@ public class ViewTransactions extends AppCompatActivity {
                 nagDialog.show();
             }
         });
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return true;
+            }
+
+
+        });
     }
 
 
@@ -90,10 +118,13 @@ public class ViewTransactions extends AppCompatActivity {
 
     public class CustomAdapter extends ArrayAdapter<Transaction>
     {
+
+         List<Transaction> filterdList;
          List<Transaction> transactions;
         public CustomAdapter(Context context, int resource, List<Transaction> objects) {
             super(context, resource, objects);
             this.transactions=objects;
+            this.filterdList=objects;
         }
         class ViewHolder
         {
@@ -129,6 +160,61 @@ TextView name,product,sell_price,buy_price;
                 return null;
             }
 
+        }
+
+        @Override
+        public int getCount() {return filterdList.size();}
+        @Nullable
+        @Override
+        public Transaction getItem(int position) {return filterdList.get(position);}
+
+        @NonNull
+        @Override
+        public Filter getFilter() {
+            return new Filter() {
+                @Override
+                protected FilterResults performFiltering(CharSequence charSequence) {
+                    // FilterResults filterResults = new FilterResults();
+                    FilterResults results = new FilterResults();
+
+                    //If there's nothing to filter on, return the original data for your list
+                    if(charSequence == null || charSequence.length() == 0)
+                    {
+                        results.values = transactions;
+                        results.count = transactions.size();
+                    }
+
+                    else
+                    {
+                        ArrayList<Transaction> filterResultsData = new ArrayList<Transaction>();
+                        for(Transaction data : transactions)
+                        {
+                            //In this loop, you'll filter through originalData and compare each item to charSequence.
+                            //If you find a match, add it to your new ArrayList
+                            //I'm not sure how you're going to do comparison, so you'll need to fill out this conditional
+                            if(data.getName().toLowerCase().contains(charSequence))
+                            {
+                                filterResultsData.add(data);
+                            }
+                        }
+                        results.values = filterResultsData;
+                        results.count = filterResultsData.size();
+                    }
+                    return results;
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                protected void publishResults(CharSequence contraint, FilterResults results) {
+                    filterdList = (ArrayList<Transaction>) results.values;
+                    if (results.count > 0) {
+                        notifyDataSetChanged();
+                    } else
+                    {
+                        notifyDataSetInvalidated();
+                    }
+                }
+            };
         }
     }
 
